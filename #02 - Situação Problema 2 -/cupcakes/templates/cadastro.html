@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar conta - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="topo">
+        <h1>Cupcakes</h1>
+    </div>
+
+    <div class="conteudo caixa-formulario">
+
+        <a href="{{ url_for('auth.login') }}" class="link-voltar">&larr; Voltar</a>
+        <h2>Criar conta</h2>
+
+        <!-- erro geral (ex: banco fora do ar) -->
+        {% if erros.geral %}
+            <div class="mensagem-erro">{{ erros.geral }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('auth.cadastro') }}">
+
+            <div class="campo">
+                <label for="nome">Nome</label>
+                <input type="text" id="nome" name="nome" maxlength="100" autocomplete="name"
+                       value="{{ dados.get('nome', '') }}">
+                {% if erros.nome %}
+                    <div class="erro-campo">{{ erros.nome }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="cpf">CPF</label>
+                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14"
+                       inputmode="numeric" value="{{ dados.get('cpf', '') }}">
+                {% if erros.cpf %}
+                    <div class="erro-campo">{{ erros.cpf }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" maxlength="120" autocomplete="email"
+                       value="{{ dados.get('email', '') }}">
+                {% if erros.email %}
+                    <div class="erro-campo">{{ erros.email }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="celular">Celular</label>
+                <input type="tel" id="celular" name="celular" placeholder="(11) 90000-0000" maxlength="15"
+                       autocomplete="tel" value="{{ dados.get('celular', '') }}">
+                {% if erros.celular %}
+                    <div class="erro-campo">{{ erros.celular }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="cep">CEP</label>
+                <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9"
+                       inputmode="numeric" autocomplete="postal-code" value="{{ dados.get('cep', '') }}">
+                       
+                            <div id="cep-aviso" class="dica" aria-live="polite"></div>
+                
+                {% if erros.cep %}
+                    <div class="erro-campo">{{ erros.cep }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="rua">Rua</label>
+                <input type="text" id="rua" name="rua" maxlength="120" value="{{ dados.get('rua', '') }}">
+                {% if erros.rua %}
+                    <div class="erro-campo">{{ erros.rua }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="numero">Número</label>
+                <input type="text" id="numero" name="numero" maxlength="10" value="{{ dados.get('numero', '') }}">
+                {% if erros.numero %}
+                    <div class="erro-campo">{{ erros.numero }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="bairro">Bairro</label>
+                <input type="text" id="bairro" name="bairro" maxlength="60" value="{{ dados.get('bairro', '') }}">
+                {% if erros.bairro %}
+                    <div class="erro-campo">{{ erros.bairro }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="cidade">Cidade</label>
+                <input type="text" id="cidade" name="cidade" maxlength="60" value="{{ dados.get('cidade', '') }}">
+                {% if erros.cidade %}
+                    <div class="erro-campo">{{ erros.cidade }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="uf">Estado (sigla)</label>
+                <input type="text" id="uf" name="uf" placeholder="SP" maxlength="2" value="{{ dados.get('uf', '') }}">
+                {% if erros.uf %}
+                    <div class="erro-campo">{{ erros.uf }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" autocomplete="new-password">
+                <div class="dica">No mínimo 8 caracteres, com uma letra maiúscula e um caractere especial (ex: !@#$).</div>                {% if erros.senha %}
+                    <div class="erro-campo">{{ erros.senha }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="botao botao-destaque">Criar conta</button>
+        </form>
+
+    </div>
+
+        <!-- javascript que preenche o endereço pelo CEP -->
+    <script src="{{ url_for('static', filename='js/cep.js') }}"></script>
+
+</body>
+</html>

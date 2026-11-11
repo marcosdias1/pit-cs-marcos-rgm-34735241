@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="topo">
+        <h1>Cupcakes</h1>
+    </div>
+
+    <div class="conteudo caixa-formulario">
+
+        <h2>Entrar</h2>
+
+        <!-- mensagens que vieram de outras telas (ex: "Você saiu da conta") -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+                <div class="mensagem-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <!-- aviso dos descontos (cartão 16) -->
+        <div class="aviso-desconto">
+            Já tem conta? Entre e ganhe desconto!<br>
+            Quem cria uma conta ganha R$ 15,00 de desconto na primeira compra.
+        </div>
+
+        <!-- erro geral (ex: CPF ou senha incorretos) -->
+        {% if erros.geral %}
+            <div class="mensagem-erro">{{ erros.geral }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+
+            <div class="campo">
+                <label for="cpf">CPF</label>
+                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14"
+                       inputmode="numeric" autocomplete="username" value="{{ dados.get('cpf', '') }}">
+                {% if erros.cpf %}
+                    <div class="erro-campo">{{ erros.cpf }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" autocomplete="current-password">
+                {% if erros.senha %}
+                    <div class="erro-campo">{{ erros.senha }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="botao botao-destaque">Entrar</button>
+            <a href="{{ url_for('senha.esqueci_senha') }}" class="link-esqueci-senha">Esqueci minha senha</a>            
+        </form>
+
+        <a href="{{ url_for('auth.visitante') }}" class="botao botao-secundario">Continuar como visitante</a>
+        <a href="{{ url_for('auth.cadastro') }}" class="botao">Criar uma conta</a>
+    
+        <!-- quem comprou como visitante acompanha o pedido com o número e o e-mail (cartão 18) -->
+        <a href="{{ url_for('acompanhamento.buscar') }}" class="link-acompanhar">Acompanhar um pedido</a>
+
+    </div>
+
+</body>
+</html>

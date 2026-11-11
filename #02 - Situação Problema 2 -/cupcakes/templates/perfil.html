@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu perfil - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+
+        <!-- carrinho e quem está usando o site -->
+        <div class="usuario">
+            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            Olá, {{ session.nome }} |
+            
+            <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+            <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |
+            <a href="{{ url_for('auth.logout') }}">Sair</a>
+        </div>
+    </div>
+
+    <div class="conteudo caixa-detalhe">
+
+        <a href="{{ url_for('vitrine.vitrine') }}" class="link-voltar">&larr; Voltar à vitrine</a>
+        <h2>Meu perfil</h2>
+
+        <!-- mensagens de aviso -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+                <div class="mensagem-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% if erro_geral != "" %}
+            <div class="mensagem-erro">{{ erro_geral }}</div>
+        {% endif %}
+
+        <!-- dados da conta -->
+        <div class="secao">
+            <h3>Meus dados</h3>
+
+            <form method="POST" action="{{ url_for('perfil.perfil') }}">
+
+                <div class="campo">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" maxlength="100" autocomplete="name"
+                           value="{{ dados.nome }}">
+                    {% if erros.nome %}
+                        <div class="erro-campo">{{ erros.nome }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- o CPF é o login, então não dá pra trocar -->
+                <div class="campo">
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpf" value="{{ cpf }}" disabled>
+                    <div class="dica">O CPF é o seu login e não pode ser trocado.</div>
+                </div>
+
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" maxlength="120" autocomplete="email"
+                           value="{{ dados.email }}">
+                    {% if erros.email %}
+                        <div class="erro-campo">{{ erros.email }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="celular">Celular</label>
+                    <input type="tel" id="celular" name="celular" placeholder="(11) 90000-0000" maxlength="15"
+                           autocomplete="tel" value="{{ dados.celular }}">
+                    {% if erros.celular %}
+                        <div class="erro-campo">{{ erros.celular }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="botao botao-destaque">Salvar meus dados</button>
+            </form>
+        </div>
+
+        <!-- endereços -->
+        <div class="secao">
+            <h3>Meus endereços</h3>
+
+            {% if enderecos|length == 0 %}
+                <div class="mensagem-info">Você não tem nenhum endereço guardado. Adicione um para ele vir preenchido no fechamento do pedido.</div>
+            {% endif %}
+
+            {% for endereco in enderecos %}
+                <div class="cartao-endereco">
+
+                    <div class="endereco-topo">
+                        <strong>{{ endereco.nome }}</strong>
+                        {% if endereco.principal %}
+                            <span class="etiqueta-principal">Principal</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="endereco-texto">{{ endereco.resumo }}</div>
+
+                    <div class="endereco-botoes">
+                        <a href="{{ url_for('perfil.editar_endereco', id_endereco=endereco.id) }}" class="botao">Editar</a>
+
+                        {% if endereco.principal == False %}
+                            <form method="POST" action="{{ url_for('perfil.endereco_principal', id_endereco=endereco.id) }}">
+                                <button type="submit" class="botao">Tornar principal</button>
+                            </form>
+                        {% endif %}
+
+                        <form method="POST" action="{{ url_for('perfil.endereco_excluir', id_endereco=endereco.id) }}">
+                            <button type="submit" class="botao botao-secundario">Excluir</button>
+                        </form>
+                    </div>
+
+                </div>
+            {% endfor %}
+
+            {% if enderecos|length < maximo %}
+                <a href="{{ url_for('perfil.novo_endereco') }}" class="botao botao-destaque">Adicionar endereço</a>
+            {% else %}
+                <div class="dica">Você já tem {{ maximo }} endereços (o máximo). Exclua um para adicionar outro.</div>
+            {% endif %}
+        </div>
+
+        <p class="dica">Formas de pagamento salvas ainda não estão disponíveis: informe o cartão a cada compra.</p>
+
+    </div>
+
+</body>
+</html>

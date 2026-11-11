@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento para eventos - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+
+        <!-- carrinho e quem está usando o site -->
+        <div class="usuario">
+            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo caixa-formulario">
+
+        <a href="{{ url_for('vitrine.vitrine') }}" class="link-voltar">&larr; Voltar à vitrine</a>
+        <h2>Orçamento para eventos</h2>
+
+        <p>Festa, casamento, evento da empresa? Conte para a gente e respondemos com o orçamento.
+           Pedidos a partir de <strong>{{ minimo }} cupcakes</strong>.</p>
+
+        {% if erro_geral != "" %}
+            <div class="mensagem-erro">{{ erro_geral }}</div>
+        {% endif %}
+
+        <!-- cartão 08: abaixo do mínimo, a pessoa é orientada a comprar pelo carrinho -->
+        {% if abaixo_do_minimo %}
+            <div class="mensagem-info">
+                Para menos de {{ minimo }} cupcakes é só comprar pelo carrinho, com entrega e pagamento na hora.
+                <a href="{{ url_for('vitrine.vitrine') }}">Ver os cupcakes</a>
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('evento.pedir_orcamento') }}">
+
+            <div class="campo">
+                <label for="nome">Nome</label>
+                <input type="text" id="nome" name="nome" maxlength="100" autocomplete="name"
+                       value="{{ dados.nome }}">
+                {% if erros.nome %}
+                    <div class="erro-campo">{{ erros.nome }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" maxlength="120" autocomplete="email"
+                       value="{{ dados.email }}">
+                <div class="dica">Vamos responder o orçamento neste e-mail.</div>
+                {% if erros.email %}
+                    <div class="erro-campo">{{ erros.email }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="celular">Celular</label>
+                <input type="tel" id="celular" name="celular" placeholder="(11) 90000-0000" maxlength="15"
+                       autocomplete="tel" value="{{ dados.celular }}">
+                {% if erros.celular %}
+                    <div class="erro-campo">{{ erros.celular }}</div>
+                {% endif %}
+            </div>
+
+            <div class="linha-dupla">
+                <div class="campo">
+                    <label for="data">Data do evento</label>
+                    <input type="date" id="data" name="data" min="{{ data_minima }}" max="{{ data_maxima }}"
+                           value="{{ dados.data }}">
+                    {% if erros.data %}
+                        <div class="erro-campo">{{ erros.data }}</div>
+                    {% else %}
+                        <div class="dica">Com {{ antecedencia }} dias de antecedência, no mínimo.</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="quantidade">Quantidade</label>
+                    <input type="text" id="quantidade" name="quantidade" inputmode="numeric" maxlength="6"
+                           placeholder="{{ minimo }}" value="{{ dados.quantidade }}">
+                    {% if erros.quantidade %}
+                        <div class="erro-campo">{{ erros.quantidade }}</div>
+                    {% else %}
+                        <div class="dica">Mínimo de {{ minimo }}.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="tema">Tema do evento (opcional)</label>
+                <input type="text" id="tema" name="tema" maxlength="100" placeholder="Aniversário infantil, casamento..."
+                       value="{{ dados.tema }}">
+                {% if erros.tema %}
+                    <div class="erro-campo">{{ erros.tema }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="observacoes">Observações (opcional)</label>
+                <textarea id="observacoes" name="observacoes" rows="4" maxlength="500"
+                          placeholder="Sabores, alergias, endereço da entrega...">{{ dados.observacoes }}</textarea>
+                {% if erros.observacoes %}
+                    <div class="erro-campo">{{ erros.observacoes }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="botao botao-destaque">Pedir orçamento</button>
+        </form>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esqueci minha senha - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="topo">
+        <h1>Cupcakes</h1>
+    </div>
+
+    <div class="conteudo caixa-formulario">
+
+        <a href="{{ url_for('auth.login') }}" class="link-voltar">&larr; Voltar ao login</a>
+        <h2>Esqueci minha senha</h2>
+
+        {% if enviado %}
+
+            <!-- a resposta é a mesma existindo conta ou não (de propósito) -->
+            <div class="mensagem-ok">
+                Se esse CPF tem conta, enviamos um link para o e-mail cadastrado.
+                O link vale por {{ minutos }} minutos e só pode ser usado uma vez.
+            </div>
+
+            {% if link_demonstracao != "" %}
+                <!-- só aparece no modo de demonstração -->
+                <div class="mensagem-info">
+                    <strong>Modo de demonstração:</strong> como o e-mail é simulado, o link aparece aqui.<br>
+                    <a href="{{ link_demonstracao }}">{{ link_demonstracao }}</a>
+                </div>
+            {% else %}
+                <div class="dica">Ambiente de demonstração: o e-mail é simulado e aparece no terminal onde o Flask está rodando.</div>
+            {% endif %}
+
+            <a href="{{ url_for('auth.login') }}" class="botao">Voltar ao login</a>
+
+        {% else %}
+
+            <p>Digite o CPF da sua conta. Vamos enviar um link para trocar a senha no e-mail cadastrado.</p>
+
+            {% if erro != "" %}
+                <div class="mensagem-erro">{{ erro }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('senha.esqueci_senha') }}">
+
+                <div class="campo">
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14"
+                           inputmode="numeric" autocomplete="username" value="{{ cpf }}">
+                </div>
+
+                <button type="submit" class="botao botao-destaque">Enviar o link</button>
+            </form>
+
+        {% endif %}
+
+    </div>
+
+</body>
+</html>

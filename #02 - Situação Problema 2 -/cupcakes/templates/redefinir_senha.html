@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senha nova - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="topo">
+        <h1>Cupcakes</h1>
+    </div>
+
+    <div class="conteudo caixa-formulario">
+
+        <h2>Escolher uma senha nova</h2>
+
+        {% if situacao == "invalido" %}
+
+            <div class="mensagem-erro">
+                Esse link não vale mais. Ele pode ter vencido ou já ter sido usado.
+            </div>
+            <a href="{{ url_for('senha.esqueci_senha') }}" class="botao botao-destaque">Pedir um link novo</a>
+            <a href="{{ url_for('auth.login') }}" class="botao">Voltar ao login</a>
+
+        {% elif situacao == "erro" %}
+
+            <div class="mensagem-erro">Não foi possível abrir essa página agora. Tente de novo em alguns minutos.</div>
+            <a href="{{ url_for('auth.login') }}" class="botao">Voltar ao login</a>
+
+        {% else %}
+
+            {% if erros.geral %}
+                <div class="mensagem-erro">{{ erros.geral }}</div>
+            {% endif %}
+
+            <!-- o action vazio manda o formulário pra mesma página (o link com o token) -->
+            <form method="POST" action="">
+
+                <div class="campo">
+                    <label for="senha">Senha nova</label>
+                    <input type="password" id="senha" name="senha" autocomplete="new-password">
+                    <div class="dica">No mínimo 8 caracteres, com uma letra maiúscula e um caractere especial (ex: !@#$).</div>
+                    {% if erros.senha %}
+                        <div class="erro-campo">{{ erros.senha }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="confirmacao">Repita a senha nova</label>
+                    <input type="password" id="confirmacao" name="confirmacao" autocomplete="new-password">
+                    {% if erros.confirmacao %}
+                        <div class="erro-campo">{{ erros.confirmacao }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="botao botao-destaque">Trocar a senha</button>
+            </form>
+
+        {% endif %}
+
+    </div>
+
+</body>
+</html>

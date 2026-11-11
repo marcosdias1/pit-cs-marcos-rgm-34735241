@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fechar pedido - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+
+        <!-- carrinho e quem está usando o site -->
+        <div class="usuario">
+            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo caixa-detalhe">
+
+        <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-voltar">&larr; Voltar ao carrinho</a>
+        <h2>Fechar pedido</h2>
+
+        <!-- mensagens de aviso -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+                <div class="mensagem-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% if erro_geral != "" %}
+            <div class="mensagem-erro">{{ erro_geral }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('checkout.checkout') }}" id="form-checkout">
+            
+            <!-- ENTREGA (cartão 10) -->
+            <div class="secao">
+                <h3>Entrega</h3>
+
+                {% if sem_entrega %}
+                    <div class="mensagem-aviso">Ainda não entregamos nessa região. Confira o estado e a cidade.</div>
+                {% endif %}
+
+                <div class="campo">
+                    <label for="cep">CEP</label>
+                    <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9"
+                           inputmode="numeric" autocomplete="postal-code" value="{{ dados.get('cep', '') }}">
+                    <div id="cep-aviso" class="dica" aria-live="polite"></div>
+                    {% if erros.cep %}
+                        <div class="erro-campo">{{ erros.cep }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="rua">Rua</label>
+                    <input type="text" id="rua" name="rua" maxlength="120" value="{{ dados.get('rua', '') }}">
+                    {% if erros.rua %}
+                        <div class="erro-campo">{{ erros.rua }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="numero">Número</label>
+                    <input type="text" id="numero" name="numero" maxlength="10" value="{{ dados.get('numero', '') }}">
+                    {% if erros.numero %}
+                        <div class="erro-campo">{{ erros.numero }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="bairro">Bairro</label>
+                    <input type="text" id="bairro" name="bairro" maxlength="60" value="{{ dados.get('bairro', '') }}">
+                    {% if erros.bairro %}
+                        <div class="erro-campo">{{ erros.bairro }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" name="cidade" maxlength="60" value="{{ dados.get('cidade', '') }}">
+                    {% if erros.cidade %}
+                        <div class="erro-campo">{{ erros.cidade }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="uf">Estado (sigla)</label>
+                    <input type="text" id="uf" name="uf" placeholder="SP" maxlength="2" value="{{ dados.get('uf', '') }}">
+                    {% if erros.uf %}
+                        <div class="erro-campo">{{ erros.uf }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- CONTATO -->
+            <div class="secao">
+                <h3>Contato</h3>
+
+                {% if eh_cliente %}
+                    <!-- cliente logado: o contato vem da conta -->
+                    {% if contato %}
+                        <div class="contato-conta">
+                            {{ contato.nome }}<br>
+                            {{ contato.email }}<br>
+                            {{ contato.celular }}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <!-- visitante informa o e-mail pra receber o acompanhamento (cartão 18) -->
+                    <div class="campo">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" name="nome" maxlength="100" autocomplete="name"
+                               value="{{ dados.get('nome', '') }}">
+                        {% if erros.nome %}
+                            <div class="erro-campo">{{ erros.nome }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" maxlength="120" autocomplete="email"
+                               value="{{ dados.get('email', '') }}">
+                        <div class="dica">Você vai acompanhar o pedido por esse e-mail.</div>
+                        {% if erros.email %}
+                            <div class="erro-campo">{{ erros.email }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="celular">Celular</label>
+                        <input type="tel" id="celular" name="celular" placeholder="(11) 90000-0000" maxlength="15"
+                               autocomplete="tel" value="{{ dados.get('celular', '') }}">
+                        {% if erros.celular %}
+                            <div class="erro-campo">{{ erros.celular }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- CUPOM (cartão 09) -->
+            <div class="secao">
+                <h3>Cupom</h3>
+
+                {% if resumo.tem_cupom and resumo.cupom_automatico %}
+                    <div class="cupom-aplicado">Desconto do seu CPF aplicado automaticamente: {{ resumo.cupom_codigo }}</div>
+                {% endif %}
+
+                <div class="campo">
+                    <label for="cupom">Código do cupom</label>
+                    <div class="cupom-linha">
+                        <input type="text" id="cupom" name="cupom" maxlength="30" autocomplete="off"
+                               value="{{ dados.get('cupom', '') }}">
+                        <button type="submit" class="botao">Aplicar</button>
+                    </div>
+                    {% if cupom_erro != "" %}
+                        <div class="erro-campo">{{ cupom_erro }}</div>
+                    {% endif %}
+                    {% if resumo.tem_cupom and resumo.cupom_automatico == False %}
+                        <div class="cupom-aplicado">Cupom {{ resumo.cupom_codigo }} aplicado.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="botao">Calcular frete e total</button>
+        </form>
+
+        <!-- RESUMO (subtotal + frete - desconto = total) -->
+        <div class="secao resumo">
+            <h3>Resumo</h3>
+
+            <div class="linha-resumo">
+                <span>Subtotal</span>
+                <span>{{ resumo.subtotal }}</span>
+            </div>
+
+            <div class="linha-resumo">
+                <span>Frete</span>
+                {% if resumo.frete != "" %}
+                    <span>{{ resumo.frete }}</span>
+                {% else %}
+                    <span>informe o endereço</span>
+                {% endif %}
+            </div>
+            {% if resumo.regiao != "" %}
+                <div class="dica">{{ resumo.regiao }}. Entrega em cerca de {{ resumo.minutos }} min.</div>
+            {% endif %}
+
+            {% if resumo.tem_cupom %}
+                <div class="linha-resumo">
+                    <span>Desconto ({{ resumo.cupom_codigo }})</span>
+                    <span>&minus; {{ resumo.desconto }}</span>
+                </div>
+            {% endif %}
+
+            <div class="total-linha">
+                <span>Total</span>
+                {% if resumo.total != "" %}
+                    <span class="total-valor">{{ resumo.total }}</span>
+                {% else %}
+                    <span class="total-valor">a calcular</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- vai pro pagamento: cria o pedido (etapa 5, parte 2, cartão 11) -->
+        <!-- o form="form-checkout" liga esse botão ao formulário lá de cima, mesmo estando fora dele -->
+        <button type="submit" form="form-checkout" name="acao" value="pagar" class="botao botao-destaque">Ir para o pagamento</button>
+    </div>
+
+    <!-- javascript que preenche o endereço pelo CEP -->
+    <script src="{{ url_for('static', filename='js/cep.js') }}"></script>
+
+</body>
+</html>

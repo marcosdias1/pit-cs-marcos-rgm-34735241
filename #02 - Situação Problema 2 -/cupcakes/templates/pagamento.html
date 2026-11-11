@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+
+        <!-- carrinho e quem está usando o site -->
+        <div class="usuario">
+            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo caixa-detalhe">
+
+        <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-voltar">&larr; Voltar ao carrinho</a>
+        <h2>Pagamento</h2>
+
+        <!-- mensagens de aviso (ex: "Pagamento recusado") -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+                <div class="mensagem-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <div class="total-linha">
+            <span>Total a pagar</span>
+            <span class="total-valor">{{ pedido.total_texto }}</span>
+        </div>
+
+        <!-- cartões de teste (aparece pra todo mundo, cliente e visitante) -->
+        <div class="mensagem-info" id="cartoes-de-teste">
+            <strong>Ambiente de demonstração: nenhum pagamento é de verdade.</strong><br>
+            Cartão que <strong>aprova</strong>: <span class="numero-de-teste">{{ cartao_aprovado }}</span><br>
+            Cartão que <strong>recusa</strong>: <span class="numero-de-teste">{{ cartao_recusado }}</span><br>
+            Use qualquer nome, uma validade futura (ex: 12/35) e um CVV de 3 números.
+            No PIX é só clicar em "Confirmar pagamento".
+        </div>
+
+        <!-- escolha entre PIX e cartão (o javascript mostra isso, sem ele as duas opções aparecem juntas) -->
+        <div id="escolha-forma" class="escolha-forma" hidden>
+            <label><input type="radio" name="forma_escolhida" value="pix" checked> PIX</label>
+            <label><input type="radio" name="forma_escolhida" value="cartao"> Cartão de crédito</label>
+        </div>
+
+        <!-- PIX -->
+        <div id="secao-pix" class="secao">
+            <h3>PIX</h3>
+            <form method="POST" action="{{ url_for('pagamento.pagar', numero=pedido.numero) }}">
+                <input type="hidden" name="forma" value="PIX">
+
+                <div class="qrcode">QR Code do PIX<br>(simulado)</div>
+                <p class="dica">Escaneie o QR Code no aplicativo do seu banco.</p>
+
+                <button type="submit" class="botao botao-destaque">Confirmar pagamento</button>
+            </form>
+        </div>
+
+        <!-- CARTÃO DE CRÉDITO -->
+        <div id="secao-cartao" class="secao" data-abrir="{% if abrir_cartao %}1{% else %}0{% endif %}">
+            <h3>Cartão de crédito</h3>
+            <form method="POST" action="{{ url_for('pagamento.pagar', numero=pedido.numero) }}">
+                <input type="hidden" name="forma" value="CARTAO_CREDITO">
+
+                <div class="campo">
+                    <label for="numero_cartao">Número do cartão</label>
+                    <input type="text" id="numero_cartao" name="numero_cartao" maxlength="23"
+                           inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000">
+                    {% if erros.numero %}
+                        <div class="erro-campo">{{ erros.numero }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="campo">
+                    <label for="nome_cartao">Nome impresso no cartão</label>
+                    <input type="text" id="nome_cartao" name="nome" maxlength="60" autocomplete="cc-name"
+                           value="{{ dados.get('nome', '') }}">
+                    {% if erros.nome %}
+                        <div class="erro-campo">{{ erros.nome }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="linha-dupla">
+                    <div class="campo">
+                        <label for="validade">Validade</label>
+                        <input type="text" id="validade" name="validade" maxlength="7" placeholder="MM/AA"
+                               inputmode="numeric" autocomplete="cc-exp" value="{{ dados.get('validade', '') }}">
+                        {% if erros.validade %}
+                            <div class="erro-campo">{{ erros.validade }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="cvv">CVV</label>
+                        <input type="password" id="cvv" name="cvv" maxlength="4"
+                               inputmode="numeric" autocomplete="cc-csc">
+                        {% if erros.cvv %}
+                            <div class="erro-campo">{{ erros.cvv }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <button type="submit" class="botao botao-destaque">Pagar com cartão</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- javascript que alterna entre PIX e cartão -->
+    <script src="{{ url_for('static', filename='js/pagamento.js') }}"></script>
+
+</body>
+</html>

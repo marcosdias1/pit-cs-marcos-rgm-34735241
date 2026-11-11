@@ -1,0 +1,7 @@
+Olá, professora Kátia e tutora Fabiana, vou contar aqui alguns desafios que eu tive durante o processo. 
+
+Acontece que quando estava no primeiro módulo, acabei realizando apenas a situação 1, que seria a entrega de história de usuário, mapa de afinidade e de backlog priorizado. Eu acabei não criando um diagrama ali de uso geral, fazer o UML, não criei os wireframes, etc. O que acabou impactando em não ter todos as informações catalogadas antes de iniciar a prototipação.
+
+E olhando agora na parte 2 desse Projeto Integrador Transdisciplinar, o ideal era de eu já ter pronto antes de colocar a mão no desenvolvimento de um MVP em tela. Então, o primeiro passo foi revisar a documentação que eu tinha enviado na parte 1 do projeto. E eu criei essa UML, casos expandidos, telas de interface e uma sequência de compra.
+
+Despois da criação desses documentos, fiz a criação do projeto conceitual, projeto lógico normalizado para o banco de dados. Entretanto, para o situação 2, para fins de simplificação, e por não ser necessária a função para elaborar uma prototipação em tela e testes com os usuário 5 usuários solicitados, não vou utilizar as funções do banco para funcionário e entregador (principalmente a entrada de serviço e a saída para entrega.)

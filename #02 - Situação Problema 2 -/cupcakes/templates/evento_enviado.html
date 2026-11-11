@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento enviado - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+
+        <!-- carrinho e quem está usando o site -->
+        <div class="usuario">
+            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo caixa-detalhe confirmado">
+
+        <div class="confirmado-emoji">🎉</div>
+        <h2>Pedido de orçamento enviado!</h2>
+        <p>Protocolo: <strong>#{{ numero }}</strong></p>
+        <p>Vamos responder em <strong>{{ email }}</strong> em até {{ prazo }}, com os valores e os detalhes da encomenda.</p>
+
+        <div class="dica">Ambiente de demonstração: o e-mail é simulado e aparece no terminal onde o Flask está rodando.</div>
+
+        <a href="{{ url_for('vitrine.vitrine') }}" class="botao botao-destaque">Voltar à vitrine</a>
+
+    </div>
+
+</body>
+</html>

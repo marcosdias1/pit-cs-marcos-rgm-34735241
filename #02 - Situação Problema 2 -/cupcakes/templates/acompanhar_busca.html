@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acompanhar pedido - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+
+        <!-- carrinho e quem está usando o site -->
+        <div class="usuario">
+            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |                
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo caixa-formulario">
+
+        <a href="{{ url_for('auth.login') }}" class="link-voltar">&larr; Voltar</a>
+        <h2>Acompanhar um pedido</h2>
+
+        <p>Digite o número do pedido e o e-mail que você usou na compra.</p>
+
+        {% if erro_geral != "" %}
+            <div class="mensagem-erro">{{ erro_geral }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('acompanhamento.buscar') }}">
+
+            <div class="campo">
+                <label for="numero">Número do pedido</label>
+                <input type="text" id="numero" name="numero" placeholder="10002" maxlength="10"
+                       inputmode="numeric" value="{{ dados.get('numero', '') }}">
+                {% if erros.numero %}
+                    <div class="erro-campo">{{ erros.numero }}</div>
+                {% endif %}
+            </div>
+
+            <div class="campo">
+                <label for="email">E-mail da compra</label>
+                <input type="email" id="email" name="email" maxlength="120" autocomplete="email"
+                       value="{{ dados.get('email', '') }}">
+                {% if erros.email %}
+                    <div class="erro-campo">{{ erros.email }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="botao botao-destaque">Ver meu pedido</button>
+        </form>
+
+        <div class="dica">
+            Quem comprou com uma conta acompanha o pedido entrando na conta.
+        </div>
+
+    </div>
+
+</body>
+</html>

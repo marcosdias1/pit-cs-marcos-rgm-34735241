@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ c.nome }} - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="topo">
+        <h1>Cupcakes</h1>
+        <div class="usuario">
+                        <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |                
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo caixa-detalhe">
+
+         <!-- mensagens de aviso (ex: "Só temos 3 em estoque") -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+                <div class="mensagem-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <a href="{{ url_for('vitrine.vitrine') }}" class="link-voltar">&larr; Voltar</a>
+
+       <div class="detalhe-foto">🧁</div>
+
+        <h2>{{ c.nome }}</h2>
+        <div class="categoria">{{ c.categorias }}</div>
+        <div class="preco preco-grande">{{ c.preco }}</div>
+
+        <h3>Descrição</h3>
+        <p>{{ c.descricao }}</p>
+
+        <h3>Ingredientes</h3>
+        <p>{{ c.ingredientes }}</p>
+
+        <h3>Alérgenos</h3>
+        {% if c.alergenos %}
+            <p>Contém: {{ c.alergenos }}</p>
+        {% else %}
+            <p>Não informado. Se você tem alergia, fale com a loja antes de pedir.</p>
+        {% endif %}
+
+        <h3>Açúcar</h3>
+        {% if c.contem_acucar %}
+            <p>Contém açúcar comum.</p>
+        {% else %}
+            <p>Sem açúcar comum (diet).</p>
+        {% endif %}
+
+        <!-- escolher a quantidade e adicionar ao carrinho (cartão 05) -->
+        <form method="POST" action="{{ url_for('carrinho.adicionar') }}" class="form-adicionar">
+            <input type="hidden" name="id_produto" value="{{ c.id }}">
+            <input type="hidden" name="voltar_para" value="vitrine">
+
+            <label for="quantidade" class="rotulo-quantidade">Quantidade</label>
+            <div class="seletor-quantidade">
+                <button type="button" id="menos" class="botao-quantidade" aria-label="Diminuir a quantidade" hidden>&minus;</button>
+                <input type="number" id="quantidade" name="quantidade" value="1" min="1" max="99" inputmode="numeric">
+                <button type="button" id="mais" class="botao-quantidade" aria-label="Aumentar a quantidade" hidden>+</button>
+            </div>
+
+            <button type="submit" class="botao botao-destaque">Adicionar ao carrinho</button>
+        </form>
+
+    </div>
+
+    <!-- javascript da tela de detalhes (botões de mais e menos da quantidade) -->
+    <script src="{{ url_for('static', filename='js/detalhe.js') }}"></script>
+
+</body>
+</html>

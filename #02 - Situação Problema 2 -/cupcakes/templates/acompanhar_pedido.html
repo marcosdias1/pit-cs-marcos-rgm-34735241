@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido #{{ dados.numero }} - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- sem javascript, a página recarrega sozinha de 15 em 15 segundos -->
+    <noscript><meta http-equiv="refresh" content="15"></noscript>
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+
+        <!-- carrinho e quem está usando o site -->
+        <div class="usuario">
+            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |                
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo caixa-detalhe" id="acompanhamento" data-numero="{{ dados.numero }}"
+         data-entregue="{% if dados.entregue %}1{% else %}0{% endif %}">
+
+        <a href="{{ url_for('vitrine.vitrine') }}" class="link-voltar">&larr; Voltar</a>
+        <h2>Pedido #{{ dados.numero }}</h2>
+
+        <!-- mensagens de aviso -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+                <div class="mensagem-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% if aviso != "" %}
+            <div class="mensagem-aviso">{{ aviso }}</div>
+        {% endif %}
+        <!-- o javascript usa essa caixa quando perde a conexão -->
+        <div id="aviso-js" class="mensagem-aviso" hidden></div>
+
+        <!-- status de agora (o aria-live avisa quem usa leitor de tela quando muda) -->
+        <div class="secao" aria-live="polite">
+            <div id="status-texto" class="status-grande">{{ dados.status_texto }}</div>
+            <div id="status-descricao">{{ dados.descricao }}</div>
+            <div id="previsao" class="dica">{{ dados.previsao }}</div>
+        </div>
+
+        <!-- as etapas do pedido (cartão 12: fluxo visual) -->
+        <ol id="linha-do-tempo" class="linha-do-tempo">
+            {% for etapa in dados.etapas %}
+                <li class="etapa etapa-{{ etapa.estado }}"{% if etapa.estado == "atual" %} aria-current="step"{% endif %}>{{ etapa.texto }}</li>
+            {% endfor %}
+        </ol>
+
+        <!-- o que tem no pedido -->
+        <div class="secao">
+            <h3>Seu pedido</h3>
+
+            {% for item in itens %}
+                <div class="linha-resumo">
+                    <span>{{ item.quantidade }}x {{ item.nome }}</span>
+                    <span>{{ item.subtotal_texto }}</span>
+                </div>
+            {% endfor %}
+
+            <div class="total-linha">
+                <span>Total</span>
+                <span class="total-valor">{{ pedido.total_texto }}</span>
+            </div>
+        </div>
+
+        <p class="dica">Ambiente de demonstração: o status do pedido avança sozinho, de poucos em poucos segundos.</p>
+
+        <a href="{{ url_for('vitrine.vitrine') }}" class="botao botao-destaque">Voltar à vitrine</a>
+
+    </div>
+
+    <!-- javascript que atualiza o status sem recarregar a página -->
+    <script src="{{ url_for('static', filename='js/acompanhar.js') }}"></script>
+
+</body>
+</html>

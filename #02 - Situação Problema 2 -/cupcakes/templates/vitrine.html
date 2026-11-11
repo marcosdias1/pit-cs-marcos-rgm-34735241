@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+        <div class="usuario">
+                        <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |                
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo">
+
+        <!-- mensagens de aviso (ex: "Bem-vindo de volta") -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+                <div class="mensagem-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <!-- se deu algum erro mostra a mensagem -->
+        {% if erro != "" %}
+            <div class="mensagem-erro">{{ erro }}</div>
+        {% endif %}
+
+        <!-- busca por nome ou ingrediente (cartão 04) -->
+        <form method="GET" action="{{ url_for('vitrine.vitrine') }}" id="form-busca" class="form-busca">
+            <label for="campo-busca" class="so-leitor">Buscar cupcake por nome ou ingrediente</label>
+            <input type="search" id="campo-busca" name="busca" maxlength="60"
+                   placeholder="Busque por nome ou ingrediente" value="{{ busca_atual }}">
+            <input type="hidden" id="campo-categoria" name="categoria" value="{{ categoria_atual }}">
+        </form>
+
+        <!-- festa ou evento? (cartão 08) -->
+        <a href="{{ url_for('evento.pedir_orcamento') }}" class="aviso-evento">🎉 Vai fazer uma festa? Peça um orçamento a partir de 30 cupcakes</a>
+
+        <!-- botões de filtro por categoria (cartão 02) -->
+        <div class="chips">
+            <a href="{{ url_for('vitrine.vitrine', busca=busca_atual) }}"
+               class="chip {% if categoria_atual == '' %}chip-ativo{% endif %}"
+               {% if categoria_atual == '' %}aria-current="true"{% endif %} data-id="">Todos</a>
+            {% for cat in categorias %}
+                <a href="{{ url_for('vitrine.vitrine', categoria=cat.id, busca=busca_atual) }}"
+                   class="chip {% if categoria_atual == cat.id|string %}chip-ativo{% endif %}"
+                   {% if categoria_atual == cat.id|string %}aria-current="true"{% endif %} data-id="{{ cat.id }}">{{ cat.nome }}</a>
+            {% endfor %}
+        </div>
+
+        <!-- avisos da lista (o javascript também usa essas duas caixas) -->
+        <div id="aviso-vazio" class="mensagem-info" {% if aviso == "" %}hidden{% endif %}>{{ aviso }}</div>
+        <div id="erro-js" class="mensagem-erro" hidden></div>
+
+        <!-- lista de cupcakes (grade) -->        
+        <div class="grade" id="grade" aria-live="polite">
+            {% for c in cupcakes %}
+                <div class="card">
+                    <div class="foto">🧁</div>
+                    <div class="nome"><a href="{{ url_for('vitrine.detalhe', id_cupcake=c.id) }}">{{ c.nome }}</a></div>                    <div class="categoria">{{ c.categorias }}</div>
+                    <div class="preco">{{ c.preco }}</div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <!-- pop-up do cupom (só aparece logo depois de criar a conta) -->
+    {% if mostrar_cupom %}
+        <div class="popup-fundo" id="popup-cupom">
+            <div class="popup-caixa">
+                <div class="popup-emoji">🎉</div>
+                <h2>Conta criada!</h2>
+                <p>Você ganhou um cupom de <strong>R$ 15,00</strong> de desconto na sua primeira compra.</p>
+                <button type="button" class="botao botao-destaque"
+                        onclick="document.getElementById('popup-cupom').style.display = 'none';">Entendi</button>
+            </div>
+        </div>
+    {% endif %}
+
+        <!-- javascript da vitrine (filtro e busca sem recarregar a página) -->
+    <script src="{{ url_for('static', filename='js/vitrine.js') }}"></script>
+
+</body>
+</html>

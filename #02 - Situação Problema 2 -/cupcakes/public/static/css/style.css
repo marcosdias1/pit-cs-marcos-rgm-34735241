@@ -1,0 +1,802 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #fff7fa;
+    color: #333333;
+}
+
+/* barra de cima */
+.topo {
+    background-color: #e75480;
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;    
+}
+
+.topo h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.usuario {
+    font-size: 14px;
+}
+
+.usuario a {
+    color: white;
+    font-weight: bold;
+}
+
+.conteudo {
+    padding: 16px;
+}
+
+/* grade de cupcakes: 2 colunas no celular */
+.grade {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* no computador (tela maior) fica com 4 colunas */
+@media (min-width: 768px) {
+    .grade {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+}
+
+.card {
+    background-color: white;
+    border: 1px solid #f0c2d2;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+.foto {
+    font-size: 48px;
+    background-color: #fde4ec;
+    border-radius: 8px;
+    padding: 16px 0;
+}
+
+.nome {
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.categoria {
+    font-size: 12px;
+    color: #888888;
+}
+
+.preco {
+    color: #e75480;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+/* ---------- mensagens ---------- */
+
+/* caixa de mensagem de erro */
+.mensagem-erro {
+    background-color: #ffe0e0;
+    color: #a00000;
+    border: 1px solid #a00000;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+/* caixa de mensagem de sucesso */
+.mensagem-ok {
+    background-color: #e3f6e5;
+    color: #1b5e20;
+    border: 1px solid #1b5e20;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+/* caixa de aviso */
+.mensagem-aviso {
+    background-color: #fff4d6;
+    color: #7a5200;
+    border: 1px solid #7a5200;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+/* ---------- formulários (login e cadastro) ---------- */
+
+/* caixa do formulário, no computador não fica esticada */
+.caixa-formulario {
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.aviso-desconto {
+    background-color: #fde4ec;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.campo {
+    margin-bottom: 14px;
+}
+
+.campo label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+/* font-size 16px é pro celular não dar zoom sozinho */
+.campo input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+}
+
+.erro-campo {
+    color: #a00000;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.dica {
+    color: #888888;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* botões (tanto <button> quanto link <a> com cara de botão) */
+.botao {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #e75480;
+    background-color: white;
+    border: 2px solid #e75480;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.botao-secundario {
+    color: #555555;
+    border-color: #999999;
+}
+
+.botao-destaque {
+    color: white;
+    background-color: #e75480;
+}
+
+.link-voltar {
+    color: #e75480;
+    text-decoration: none;
+}
+
+/* ---------- pop-up do cupom ---------- */
+
+.popup-fundo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.popup-caixa {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 340px;
+    text-align: center;
+}
+
+.popup-emoji {
+    font-size: 48px;
+}
+
+
+
+/* ---------- busca e filtros da vitrine ---------- */
+
+/* texto que só o leitor de tela lê (fica escondido na tela) */
+.so-leitor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+}
+
+.form-busca {
+    margin-bottom: 12px;
+}
+
+.form-busca input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+}
+
+/* botões de categoria (um do lado do outro, quebra a linha se faltar espaço) */
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+/* min-height 44px deixa o botão fácil de tocar no celular */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 0 16px;
+    font-size: 15px;
+    color: #e75480;
+    background-color: white;
+    border: 2px solid #e75480;
+    border-radius: 22px;
+    text-decoration: none;
+}
+
+.chip-ativo {
+    color: white;
+    background-color: #e75480;
+}
+
+/* caixa de aviso neutra (ex: nenhum cupcake encontrado) */
+.mensagem-info {
+    background-color: #eef4ff;
+    color: #1d3c6e;
+    border: 1px solid #1d3c6e;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+/* o atributo hidden tem que esconder mesmo quando a classe tem display */
+[hidden] {
+    display: none !important;
+}
+
+/* mostra por onde o teclado está passando (ajuda quem não usa mouse) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid #1d3c6e;
+    outline-offset: 2px;
+}
+
+/* faz o card inteiro ser clicável (o link do nome "estica" por cima do card) */
+.card {
+    position: relative;
+}
+
+.card .nome a {
+    color: #333333;
+    text-decoration: none;
+}
+
+.card .nome a::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ---------- tela de detalhes ---------- */
+
+.caixa-detalhe {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.detalhe-foto {
+    font-size: 96px;
+    text-align: center;
+    background-color: #fde4ec;
+    border-radius: 12px;
+    padding: 24px 0;
+    margin-top: 12px;
+}
+
+.preco-grande {
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+.caixa-detalhe h3 {
+    margin-bottom: 4px;
+}
+
+.caixa-detalhe p {
+    margin-top: 0;
+    line-height: 1.4;
+}
+
+
+
+/* ---------- carrinho ---------- */
+
+/* ícone do carrinho no topo (o link já fica branco por causa do .usuario a) */
+.link-carrinho {
+    text-decoration: none;
+}
+
+.qtd-carrinho {
+    background-color: white;
+    color: #e75480;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 13px;
+}
+
+/* escolher a quantidade na tela de detalhes */
+.form-adicionar {
+    margin-top: 16px;
+}
+
+.rotulo-quantidade {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.seletor-quantidade {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.seletor-quantidade input {
+    width: 70px;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+}
+
+/* botões de mais e menos (44px é um tamanho bom pra tocar no celular) */
+.botao-quantidade {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #e75480;
+    background-color: white;
+    border: 2px solid #e75480;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* cada linha do carrinho (a segunda linha é a dos botões) */
+.item-carrinho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    background-color: white;
+    border: 1px solid #f0c2d2;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.item-foto {
+    font-size: 32px;
+    background-color: #fde4ec;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.item-info {
+    flex: 1;
+    min-width: 140px;
+}
+
+.item-controles {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.form-linha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.quantidade {
+    min-width: 28px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.linha-fim {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.botao-lixeira {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    background-color: white;
+    border: 2px solid #cccccc;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* sugestões de adicionais */
+.adicionais {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.adicional {
+    background-color: white;
+    border: 1px solid #f0c2d2;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+/* linha do total */
+.total-linha {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 16px 0;
+    padding-top: 12px;
+    border-top: 2px solid #f0c2d2;
+}
+
+.total-valor {
+    color: #e75480;
+}
+
+
+
+/* ---------- fechar pedido ---------- */
+
+/* cada pedaço do formulário (entrega, contato, cupom, resumo) numa caixinha */
+.secao {
+    background-color: white;
+    border: 1px solid #f0c2d2;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 14px;
+}
+
+.secao h3 {
+    margin-top: 0;
+}
+
+.contato-conta {
+    line-height: 1.5;
+}
+
+/* campo do cupom com o botão Aplicar do lado */
+.cupom-linha {
+    display: flex;
+    gap: 8px;
+}
+
+.cupom-linha input {
+    flex: 1;
+    min-width: 0;
+}
+
+.cupom-linha .botao {
+    width: auto;
+    margin-top: 0;
+    padding: 0 16px;
+}
+
+.cupom-aplicado {
+    color: #1b5e20;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+/* resumo do pedido */
+.linha-resumo {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+}
+
+
+
+/* ---------- pagamento ---------- */
+
+/* escolha entre PIX e cartão */
+.escolha-forma {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+/* "QR Code" de mentira (é só uma caixa) */
+.qrcode {
+    width: 180px;
+    height: 180px;
+    margin: 12px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 8px;
+    font-size: 14px;
+    color: #555555;
+    background-color: #f2f2f2;
+    border: 3px dashed #999999;
+    border-radius: 8px;
+}
+
+/* números dos cartões de teste */
+.numero-de-teste {
+    font-family: Consolas, monospace;
+    font-weight: bold;
+}
+
+/* duas colunas (validade e cvv) */
+.linha-dupla {
+    display: flex;
+    gap: 10px;
+}
+
+.linha-dupla .campo {
+    flex: 1;
+}
+
+/* tela de pedido confirmado */
+.confirmado {
+    text-align: center;
+}
+
+.confirmado .secao {
+    text-align: left;
+}
+
+.confirmado-emoji {
+    font-size: 64px;
+}
+
+
+/* ---------- acompanhar pedido ---------- */
+
+/* o status de agora, grande */
+.status-grande {
+    font-size: 24px;
+    font-weight: bold;
+    color: #e75480;
+    margin-bottom: 4px;
+}
+
+/* a lista de etapas (feito, atual, próximo) */
+.linha-do-tempo {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px 0;
+}
+
+.etapa {
+    position: relative;
+    padding: 12px 12px 12px 44px;
+    margin-bottom: 8px;
+    color: #777777;
+    background-color: white;
+    border: 1px solid #f0c2d2;
+    border-radius: 10px;
+}
+
+/* o símbolo de cada etapa (além da cor, pra quem não enxerga bem as cores) */
+.etapa::before {
+    content: "○";
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    font-size: 20px;
+}
+
+.etapa-feito {
+    color: #1b5e20;
+}
+
+.etapa-feito::before {
+    content: "✔";
+}
+
+.etapa-atual {
+    color: white;
+    font-weight: bold;
+    background-color: #e75480;
+    border-color: #e75480;
+}
+
+.etapa-atual::before {
+    content: "●";
+}
+
+/* link "Acompanhar um pedido" na tela de login */
+.link-acompanhar {
+    display: block;
+    margin-top: 16px;
+    text-align: center;
+    color: #e75480;
+}
+
+/* ---------- meus pedidos ---------- */
+
+.pedido-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+/* etiqueta com o status do pedido */
+.pedido-status {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 12px;
+    color: #7a5200;
+    background-color: #fff4d6;
+}
+
+.pedido-status-entregue {
+    color: #1b5e20;
+    background-color: #e3f6e5;
+}
+
+.pedido-status-cancelado {
+    color: #a00000;
+    background-color: #ffe0e0;
+}
+
+.pedido-itens {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+.pedido-total {
+    margin-bottom: 4px;
+}
+
+/* os dois botões ficam lado a lado no computador e um embaixo do outro no celular */
+.pedido-botoes {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 10px;
+}
+
+@media (min-width: 480px) {
+    .pedido-botoes {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ---------- meu perfil e recuperar senha ---------- */
+
+/* link "Esqueci minha senha" na tela de login */
+.link-esqueci-senha {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    color: #e75480;
+}
+
+/* cada endereço da lista */
+.cartao-endereco {
+    border: 1px solid #f0c2d2;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.endereco-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+/* etiqueta "Principal" */
+.etiqueta-principal {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 12px;
+    color: white;
+    background-color: #e75480;
+}
+
+.endereco-texto {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+/* os botões de cada endereço ficam um embaixo do outro no celular e lado a lado no computador */
+.endereco-botoes {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 10px;
+}
+
+@media (min-width: 480px) {
+    .endereco-botoes {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+}
+
+/* ---------- orçamento para eventos ---------- */
+
+/* faixa de aviso na vitrine */
+.aviso-evento {
+    display: block;
+    margin-bottom: 12px;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: #e75480;
+    background-color: #fde4ec;
+    border: 1px dashed #e75480;
+    border-radius: 8px;
+}
+
+/* a caixa de texto grande (observações) fica igual aos outros campos */
+.campo textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+    font-family: inherit;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    resize: vertical;
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu carrinho - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- cabeçalho do site -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+
+        <!-- carrinho e quem está usando o site -->
+        <div class="usuario">
+            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |                
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="conteudo caixa-detalhe">
+
+        <a href="{{ url_for('vitrine.vitrine') }}" class="link-voltar">&larr; Continuar comprando</a>
+        <h2>Meu carrinho</h2>
+
+        <!-- mensagens de aviso (ex: "Adicionado ao carrinho!") -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, texto in mensagens %}
+                <div class="mensagem-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <!-- se deu algum erro mostra a mensagem -->
+        {% if erro != "" %}
+            <div class="mensagem-erro">{{ erro }}</div>
+        {% endif %}
+
+        {% if itens|length == 0 and erro == "" %}
+
+            <!-- carrinho vazio -->
+            <div class="mensagem-info">Seu carrinho está vazio.</div>
+            <a href="{{ url_for('vitrine.vitrine') }}" class="botao botao-destaque">Ver cupcakes</a>
+
+        {% endif %}
+
+        {% if itens|length > 0 %}
+
+            <!-- itens do carrinho (cartão 07: mais, menos e lixeira) -->
+            {% for item in itens %}
+                <div class="item-carrinho">
+                    <div class="item-foto">{% if item.tipo == "CUPCAKE" %}🧁{% else %}🎁{% endif %}</div>
+
+                    <div class="item-info">
+                        <div class="nome">{{ item.nome }}</div>
+                        <div class="categoria">{{ item.preco_texto }} cada</div>
+                        {% if item.disponivel == False %}
+                            <div class="erro-campo">Sem estoque no momento. Tire este item para continuar.</div>
+                        {% elif item.quantidade > item.estoque %}
+                            <div class="erro-campo">Só temos {{ item.estoque }} em estoque. Diminua a quantidade.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="item-controles">
+                        <form method="POST" action="{{ url_for('carrinho.alterar') }}" class="form-linha">
+                            <input type="hidden" name="id_produto" value="{{ item.id }}">
+                            <button type="submit" name="acao" value="menos" class="botao-quantidade"
+                                    aria-label="Diminuir a quantidade de {{ item.nome }}">&minus;</button>
+                            <span class="quantidade">{{ item.quantidade }}</span>
+                            <button type="submit" name="acao" value="mais" class="botao-quantidade"
+                                    aria-label="Aumentar a quantidade de {{ item.nome }}">+</button>
+                        </form>
+
+                        <div class="linha-fim">
+                            <div class="preco">{{ item.subtotal_texto }}</div>
+                            <form method="POST" action="{{ url_for('carrinho.remover') }}" class="form-linha">
+                                <input type="hidden" name="id_produto" value="{{ item.id }}">
+                                <button type="submit" class="botao-lixeira"
+                                        aria-label="Tirar {{ item.nome }} do carrinho">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- sugestões de adicionais (cartão 06) -->
+            {% if adicionais|length > 0 %}
+                <h3>Que tal adicionar?</h3>
+                <div class="adicionais">
+                    {% for a in adicionais %}
+                        <form method="POST" action="{{ url_for('carrinho.adicionar') }}" class="adicional">
+                            <input type="hidden" name="id_produto" value="{{ a.id }}">
+                            <input type="hidden" name="quantidade" value="1">
+                            <input type="hidden" name="voltar_para" value="carrinho">
+                            <div class="nome">{{ a.nome }}</div>
+                            <div class="preco">+ {{ a.preco_texto }}</div>
+                            <button type="submit" class="botao">Adicionar</button>
+                        </form>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- total (o frete e o cupom entram na etapa 5) -->
+            <div class="total-linha">
+                <span>Total</span>
+                <span class="total-valor">{{ subtotal }}</span>
+            </div>
+
+            <!-- vai pro fechamento do pedido: endereço, frete e cupom (etapa 5) -->
+            <a href="{{ url_for('checkout.checkout') }}" class="botao botao-destaque">Fechar pedido</a>
+            
+        {% endif %}
+
+    </div>
+
+</body>
+</html>
