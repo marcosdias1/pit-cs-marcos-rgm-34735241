@@ -3,6 +3,7 @@
 from decimal import Decimal
 from app import app
 from models import carrinho_model
+from models import evento_model
 from models import historico_model
 from models import pedido_model
  
@@ -94,8 +95,13 @@ def preparar_lista(monkeypatch, pedidos):
     def atualizar(id_pedido):
         atualizadas.append(id_pedido)
 
+    # a tela também lista as encomendas de evento (aqui sempre vazia, pra não ir no banco)
+    def listar_encomendas(id_cliente, limite):
+        return []
+
     monkeypatch.setattr(carrinho_model, "contar_itens", contador_zero)
     monkeypatch.setattr(historico_model, "listar_pedidos_do_cliente", listar)
+    monkeypatch.setattr(evento_model, "listar_solicitacoes_do_cliente", listar_encomendas)
     monkeypatch.setattr(pedido_model, "atualizar_status_simulado", atualizar)
     return atualizadas, listagens
 

@@ -11,25 +11,8 @@
 </head>
 <body>
 
-    <!-- cabeçalho do site -->
-    <div class="topo">
-        <h1>Cupcakes</h1>
-
-        <!-- carrinho e quem está usando o site -->
-        <div class="usuario">
-            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
-               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
-            {% if session.tipo == "cliente" %}
-                Olá, {{ session.nome }} |
-                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
-                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |                
-                <a href="{{ url_for('auth.logout') }}">Sair</a>
-            {% else %}
-                Visitante |
-                <a href="{{ url_for('auth.login') }}">Entrar</a>
-            {% endif %}
-        </div>
-    </div>
+    <!-- cabeçalho do site (um arquivo só, em _topo.html) -->
+    {% include "_topo.html" %}
 
     <div class="conteudo caixa-detalhe" id="acompanhamento" data-numero="{{ dados.numero }}"
          data-entregue="{% if dados.entregue %}1{% else %}0{% endif %}">
@@ -57,6 +40,13 @@
             <div id="previsao" class="dica">{{ dados.previsao }}</div>
         </div>
 
+        <!-- aviso de que a pessoa vai receber uma mensagem quando o pedido sair para entrega -->
+        <!-- IMPORTANTE: nesta versão nenhuma mensagem é enviada de verdade, e o texto diz isso -->
+        <div id="aviso-saida" class="mensagem-info" {% if not dados.avisar_saida %}hidden{% endif %}>
+            Avisaremos você por mensagem quando o pedido sair para entrega.
+            <div class="dica">Ambiente de demonstração: nenhuma mensagem é enviada de verdade.</div>
+        </div>
+
         <!-- as etapas do pedido (cartão 12: fluxo visual) -->
         <ol id="linha-do-tempo" class="linha-do-tempo">
             {% for etapa in dados.etapas %}
@@ -80,6 +70,17 @@
                 <span class="total-valor">{{ pedido.total_texto }}</span>
             </div>
         </div>
+
+        <!-- cancelar o pedido (só aparece até ele sair para entrega; o javascript esconde quando o status muda) -->
+        {% if dados.pode_cancelar %}
+            <div id="area-cancelar">
+                <form method="POST" action="{{ url_for('pedidos.cancelar', numero=dados.numero) }}"
+                      onsubmit="return confirm('Cancelar o pedido #{{ dados.numero }}?');">
+                    <button type="submit" class="botao botao-perigo">Cancelar pedido</button>
+                </form>
+                <div class="dica">Dá para cancelar até o pedido sair para entrega.</div>
+            </div>
+        {% endif %}
 
         <p class="dica">Ambiente de demonstração: o status do pedido avança sozinho, de poucos em poucos segundos.</p>
 

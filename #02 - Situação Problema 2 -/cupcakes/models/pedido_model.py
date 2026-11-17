@@ -2,6 +2,7 @@ from decimal import Decimal
 from models import cupom_regras
 from models import carrinho_model
 from models import acompanhamento
+from models import cancelamento_regras
 from models.conexao import pegar_conexao
 
 # model do pedido
@@ -318,6 +319,23 @@ def buscar_pedido_por_numero(numero):
     return pedido
 
 
+# função que acha o número de um pedido pelo id (o link "Acompanhar pedido" do visitante guarda só o id na sessão)
+# devolve o número, ou None se não achar
+def buscar_numero_por_id(id_pedido):
+    con = pegar_conexao()
+    cur = con.cursor()
+
+    cur.execute("SELECT numero FROM pedido WHERE id_pedido = %s", (id_pedido,))
+    linha = cur.fetchone()
+
+    cur.close()
+    con.close()
+
+    if linha is None:
+        return None
+    return linha[0]
+
+
 # função que lista os itens de um pedido (pra tela de pedido confirmado)
 def listar_itens_do_pedido(id_pedido):
     con = pegar_conexao()
@@ -439,6 +457,49 @@ def confirmar_pagamento(id_pedido, id_carrinho, forma, valor, codigo, id_cliente
                             (id_carrinho, id_pedido))
 
                 con.commit()
+
+    except Exception as e:
+        con.rollback()
+        cur.close()
+        con.close()
+        raise e
+
+    cur.close()
+    con.close()
+    return mensagem
+
+
+# função que cancela o pedido: muda o status, devolve os itens pro estoque e grava no histórico
+# tudo junto: se qualquer parte falhar, desfaz tudo
+# id_pessoa é quem cancelou (None quando é visitante)
+# devolve "" se deu certo, ou o texto do problema (ex: o pedido já saiu para entrega)
+def cancelar_pedido(id_pedido, id_pessoa):
+    mensagem = ""
+    con = pegar_conexao()
+    cur = con.cursor()
+
+    try:
+        # trava o pedido (assim a simulação do acompanhamento não muda o status no meio do cancelamento)
+        cur.execute("SELECT status FROM pedido WHERE id_pedido = %s FOR UPDATE", (id_pedido,))
+        linha = cur.fetchone()
+
+        if linha is None:
+            mensagem = "Pedido não encontrado."
+        elif cancelamento_regras.pode_cancelar(linha[0]) == False:
+            # confere o status de novo aqui dentro, porque ele pode ter mudado desde que a tela abriu
+            mensagem = cancelamento_regras.motivo_de_nao_poder(linha[0])
+        else:
+            # devolve cada item pro estoque (na confirmação do pagamento o estoque foi baixado)
+            cur.execute("SELECT id_produto, quantidade FROM item_pedido WHERE id_pedido = %s", (id_pedido,))
+            itens = cur.fetchall()
+            for item in itens:
+                cur.execute("UPDATE produto SET estoque = estoque + %s WHERE id_produto = %s", (item[1], item[0]))
+
+            cur.execute("UPDATE pedido SET status = 'CANCELADO' WHERE id_pedido = %s", (id_pedido,))
+            cur.execute("INSERT INTO historico_status (id_pedido, id_pessoa, status) VALUES (%s, %s, 'CANCELADO')",
+                        (id_pedido, id_pessoa))
+
+        con.commit()
 
     except Exception as e:
         con.rollback()

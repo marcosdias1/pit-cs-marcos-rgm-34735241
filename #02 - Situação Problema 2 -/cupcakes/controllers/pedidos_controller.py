@@ -1,6 +1,8 @@
 
 from flask import Blueprint, render_template, redirect, url_for, session, flash
+from models import cancelamento_regras
 from models import carrinho_model
+from models import evento_model
 from models import historico_model
 from models import historico_regras
 from models import pedido_model
@@ -52,8 +54,54 @@ def meus_pedidos():
         print("ERRO AO LISTAR OS PEDIDOS:", e)
         erro = "Não foi possível abrir o histórico agora. Tente de novo em alguns minutos."
 
+    # as encomendas de evento (orçamentos) dessa pessoa
+    # fica separado de propósito: se der erro aqui, os pedidos continuam aparecendo
+    encomendas = []
+    erro_encomendas = ""
+    try:
+        encomendas = evento_model.listar_solicitacoes_do_cliente(id_cliente, historico_regras.LIMITE_DE_PEDIDOS)
+    except Exception as e:
+        print("ERRO AO LISTAR AS ENCOMENDAS:", e)
+        erro_encomendas = "Não foi possível abrir as suas encomendas agora. Tente de novo em alguns minutos."
+
     return render_template("meus_pedidos.html", pedidos=pedidos, erro=erro,
+                           encomendas=encomendas, erro_encomendas=erro_encomendas,
                            limite=historico_regras.LIMITE_DE_PEDIDOS)
+
+
+# CANCELAR PEDIDO (melhoria pedida nos testes)
+# só dá pra cancelar até o pedido sair para entrega (regra em cancelamento_regras.py)
+@pedidos_bp.route("/pedido/<int:numero>/cancelar", methods=["POST"])
+def cancelar(numero):
+    if "tipo" not in session:
+        return redirect(url_for("auth.login"))
+
+    # pra onde a pessoa volta depois: cliente vai pro histórico, visitante vai pra vitrine
+    if session.get("tipo") == "cliente":
+        voltar = redirect(url_for("pedidos.meus_pedidos"))
+    else:
+        voltar = redirect(url_for("vitrine.vitrine"))
+
+    # confere se o pedido existe e se é dessa pessoa
+    pedido = pegar_pedido(numero)
+    if pedido is None:
+        return voltar
+
+    try:
+        # o status é uma simulação (muda com o tempo), então faz o pedido andar antes de conferir
+        # (se a pessoa ficou um tempo com a tela aberta, o pedido pode já ter saído para entrega)
+        pedido_model.atualizar_status_simulado(pedido["id"])
+        mensagem = pedido_model.cancelar_pedido(pedido["id"], session.get("id_cliente"))
+    except Exception as e:
+        print("ERRO AO CANCELAR O PEDIDO:", e)
+        flash("Não foi possível cancelar o pedido agora. Nada foi alterado. Tente de novo em alguns minutos.", "erro")
+        return voltar
+
+    if mensagem != "":
+        flash(mensagem, "aviso")
+    else:
+        flash(cancelamento_regras.mensagem_de_cancelado(numero), "ok")
+    return voltar
 
 
 # Comprar de novo: coloca no carrinho os itens de um pedido antigo (cartão 15)

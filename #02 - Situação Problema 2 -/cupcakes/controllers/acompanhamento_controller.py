@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from models import pedido_model
 from models import acompanhamento
+from models import cancelamento_regras
 from models import validacoes
 from controllers.pagamento_controller import pode_acessar, pegar_pedido
 
@@ -25,6 +26,9 @@ def montar_dados(numero, status, minutos_previstos, entregue_em):
     dados["etapas"] = acompanhamento.montar_etapas(status)
     dados["previsao"] = acompanhamento.frase_da_previsao(status, minutos_previstos, quando_entregou)
     dados["entregue"] = (status == "ENTREGUE")
+    # o botão "Cancelar pedido" e o aviso de saída só aparecem enquanto fazem sentido
+    dados["pode_cancelar"] = cancelamento_regras.pode_cancelar(status)
+    dados["avisar_saida"] = acompanhamento.vai_avisar_saida(status)
     return dados
 
 # função que faz o pedido andar (simulação) e monta os dados da tela com o status novo. Se o banco falhar, dá erro (quem chamou trata)
@@ -86,6 +90,37 @@ def acompanhar(numero):
         print("ERRO AO LISTAR OS ITENS DO PEDIDO:", e)
 
     return render_template("acompanhar_pedido.html", dados=dados, pedido=pedido, itens=itens, aviso=aviso)
+
+
+# link "Acompanhar pedido" do topo (visitante): leva direto ao último pedido dele
+# se ele ainda não tem pedido nessa sessão, vai pra busca por número e e-mail
+@acompanhamento_bp.route("/acompanhar/ultimo")
+def ultimo():
+    # os pedidos que o visitante pagou ou achou na busca ficam nessa lista (o último é o mais novo)
+    id_pedido = None
+    liberados = session.get("pedidos_liberados", [])
+    if len(liberados) > 0:
+        id_pedido = liberados[-1]
+
+    # se não tem nenhum, tenta o pedido que ele acabou de criar (talvez ainda sem pagar)
+    if id_pedido is None:
+        id_pedido = session.get("pedido_atual")
+
+    if id_pedido is None:
+        return redirect(url_for("acompanhamento.buscar"))
+
+    numero = None
+    try:
+        numero = pedido_model.buscar_numero_por_id(id_pedido)
+    except Exception as e:
+        print("ERRO AO ACHAR O ÚLTIMO PEDIDO:", e)
+        flash("Não foi possível abrir o pedido agora. Tente de novo em alguns minutos.", "erro")
+        return redirect(url_for("acompanhamento.buscar"))
+
+    if numero is None:
+        return redirect(url_for("acompanhamento.buscar"))
+
+    return redirect(url_for("acompanhamento.acompanhar", numero=numero))
 
 
 # rota que devolve o status em json (o javascript da tela chama ela de tempos em tempos pra atualizar sem recarregar a página)

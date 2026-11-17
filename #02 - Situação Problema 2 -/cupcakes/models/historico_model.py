@@ -1,5 +1,6 @@
 # aqui fica o que mexe no banco para o histórico de compras e a recompra (cartão 15)
 
+from models import cancelamento_regras
 from models import carrinho_model
 from models import historico_regras
 from models.conexao import pegar_conexao
@@ -33,6 +34,7 @@ def listar_pedidos_do_cliente(id_cliente, limite):
         pedido["total_texto"] = carrinho_model.formatar_dinheiro(x[3])
         pedido["data_texto"] = historico_regras.formatar_data(x[4])
         pedido["pode_acompanhar"] = historico_regras.pode_acompanhar(x[2])
+        pedido["pode_cancelar"] = cancelamento_regras.pode_cancelar(x[2])
         pedido["itens"] = []
         lista.append(pedido)
         ids.append(x[0])

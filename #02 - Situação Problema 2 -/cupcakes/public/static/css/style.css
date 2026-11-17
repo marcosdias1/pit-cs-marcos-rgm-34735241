@@ -23,6 +23,21 @@ body {
 
 .usuario {
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* os links do topo (Meu perfil, Meus pedidos...) só aparecem no computador
+   no celular eles ficam na barra de baixo (barra-ilha) */
+.links-topo {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .links-topo {
+        display: inline;
+    }
 }
 
 .usuario a {
@@ -145,6 +160,23 @@ body {
     font-size: 16px;
     border: 1px solid #cccccc;
     border-radius: 8px;
+}
+
+/* página de erro (404, 405 e 500) */
+.pagina-erro {
+    text-align: center;
+}
+
+.erro-codigo {
+    font-size: 64px;
+    font-weight: bold;
+    color: #e75480;
+    line-height: 1.1;
+}
+
+.pagina-erro .botao {
+    display: block;
+    margin-top: 10px;
 }
 
 .erro-campo {
@@ -352,15 +384,36 @@ input:focus-visible {
 
 /* ícone do carrinho no topo (o link já fica branco por causa do .usuario a) */
 .link-carrinho {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 44px;
+    color: white;
     text-decoration: none;
 }
 
+.icone-carrinho {
+    display: block;
+}
+
+/* o número do carrinho fica dentro de um círculo amarelo, em cima do ícone */
 .qtd-carrinho {
-    background-color: white;
-    color: #e75480;
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 20px;
+    height: 20px;
+    line-height: 20px;
+    box-sizing: border-box;
+    padding: 0 5px;
     border-radius: 10px;
-    padding: 1px 7px;
-    font-size: 13px;
+    background-color: #ffd23f;
+    color: #3b1d2a;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
 }
 
 /* escolher a quantidade na tela de detalhes */
@@ -699,6 +752,23 @@ input:focus-visible {
     background-color: #ffe0e0;
 }
 
+/* situações da encomenda de evento (ORCADA = orçamento enviado, CANCELADA) */
+.pedido-status-orcada {
+    color: #1b5e20;
+    background-color: #e3f6e5;
+}
+
+.pedido-status-cancelada {
+    color: #a00000;
+    background-color: #ffe0e0;
+}
+
+/* botão de cancelar (vermelho, pra não confundir com os outros) */
+.botao-perigo {
+    color: #a00000;
+    border-color: #a00000;
+}
+
 .pedido-itens {
     margin: 8px 0;
     line-height: 1.4;
@@ -799,4 +869,60 @@ input:focus-visible {
     border: 1px solid #cccccc;
     border-radius: 8px;
     resize: vertical;
+}
+
+/* ---------- barra de baixo no celular ("ilha") ---------- */
+
+.barra-ilha {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    padding: 6px;
+    background-color: white;
+    border: 1px solid #f0c2d2;
+    border-radius: 28px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    z-index: 50;
+}
+
+.item-ilha {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 4px;
+    border-radius: 22px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #555555;
+    text-decoration: none;
+}
+
+.icone-ilha {
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.item-ilha-ativo {
+    color: white;
+    background-color: #e75480;
+}
+
+/* no celular a barra cobre o fim da página, então o conteúdo ganha um espaço embaixo */
+@media (max-width: 767px) {
+    .conteudo {
+        padding-bottom: 96px;
+    }
+}
+
+/* no computador a barra de baixo some (os links ficam no topo) */
+@media (min-width: 768px) {
+    .barra-ilha {
+        display: none;
+    }
 }

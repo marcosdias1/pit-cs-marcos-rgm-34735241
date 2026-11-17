@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- essa linha faz o site ficar certo no celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }} - Loja de Cupcakes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- aqui o topo é simples de propósito: a página de erro não pode depender do banco de dados -->
+    <div class="topo">
+        <h1>Cupcakes</h1>
+    </div>
+
+    <div class="conteudo caixa-formulario pagina-erro">
+
+        <div class="erro-codigo">{{ codigo }}</div>
+        <h2>{{ titulo }}</h2>
+        <p>{{ mensagem }}</p>
+
+        <!-- o botão voltar usa o histórico do navegador (se não tiver histórico, o link da vitrine resolve) -->
+        <button type="button" class="botao" onclick="history.back();">&larr; Voltar</button>
+        <a href="{{ url_for('vitrine.vitrine') }}" class="botao botao-destaque">Ir para a vitrine</a>
+
+    </div>
+
+</body>
+</html>

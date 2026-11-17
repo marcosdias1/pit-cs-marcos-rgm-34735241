@@ -116,6 +116,12 @@ def pagar(numero):
                         else:
                             # deu tudo certo: o pedido está confirmado
                             session.pop("checkout", None)
+
+                            # guarda o pedido na lista da sessão (o link "Acompanhar pedido" do topo usa essa lista)
+                            liberados = session.get("pedidos_liberados", [])
+                            if pedido["id"] not in liberados:
+                                liberados.append(pedido["id"])
+                            session["pedidos_liberados"] = liberados[-10:]
                             return redirect(url_for("pagamento.confirmado", numero=numero))
             except Exception as e:
                 print("ERRO NO PAGAMENTO:", e)

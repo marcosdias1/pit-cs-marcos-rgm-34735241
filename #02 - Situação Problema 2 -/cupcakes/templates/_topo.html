@@ -1,0 +1,65 @@
+<!-- cabeçalho do site: fica num arquivo só e todas as telas puxam ele com o include -->
+<!-- (antes eu copiava o cabeçalho em cada tela, aí qualquer mudança tinha que ser feita 13 vezes) -->
+<div class="topo">
+    <h1>Cupcakes</h1>
+
+    <div class="usuario">
+
+        <!-- links do topo: só aparecem no computador (no celular eles vão pra barra de baixo) -->
+        <span class="links-topo">
+            {% if session.tipo == "cliente" %}
+                Olá, {{ session.nome }} |
+                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
+                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |
+                <a href="{{ url_for('auth.logout') }}">Sair</a>
+            {% else %}
+                Visitante |
+                <!-- o visitante não tem "Meus pedidos", então esse link leva ao último pedido dele -->
+                <a href="{{ url_for('acompanhamento.ultimo') }}">Acompanhar pedido</a> |
+                <a href="{{ url_for('auth.login') }}">Entrar</a>
+            {% endif %}
+        </span>
+
+        <!-- carrinho: ícone desenhado (não é mais emoji) com o número dentro de um círculo amarelo -->
+        <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
+           aria-label="Carrinho, {{ quantidade_carrinho }} itens">
+            <svg class="icone-carrinho" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" focusable="false">
+                <path d="M2 3h3l2.2 11h11.3l2.5-8H6" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"></path>
+                <circle cx="9" cy="19.5" r="1.8" fill="currentColor"></circle>
+                <circle cx="17" cy="19.5" r="1.8" fill="currentColor"></circle>
+            </svg>
+            <span class="qtd-carrinho">{{ quantidade_carrinho }}</span>
+        </a>
+    </div>
+</div>
+
+<!-- barra de baixo ("ilha"): só aparece no celular -->
+<nav class="barra-ilha" aria-label="Menu principal">
+    <a href="{{ url_for('vitrine.vitrine') }}"
+       class="item-ilha {% if request.endpoint == 'vitrine.vitrine' %}item-ilha-ativo{% endif %}">
+        <span class="icone-ilha">🧁</span>Vitrine
+    </a>
+
+    {% if session.tipo == "cliente" %}
+        <a href="{{ url_for('pedidos.meus_pedidos') }}"
+           class="item-ilha {% if request.endpoint == 'pedidos.meus_pedidos' %}item-ilha-ativo{% endif %}">
+            <span class="icone-ilha">📦</span>Pedidos
+        </a>
+        <a href="{{ url_for('perfil.perfil') }}"
+           class="item-ilha {% if request.endpoint == 'perfil.perfil' %}item-ilha-ativo{% endif %}">
+            <span class="icone-ilha">👤</span>Perfil
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="item-ilha">
+            <span class="icone-ilha">🚪</span>Sair
+        </a>
+    {% else %}
+        <a href="{{ url_for('acompanhamento.ultimo') }}"
+           class="item-ilha {% if request.endpoint in ['acompanhamento.ultimo', 'acompanhamento.buscar', 'acompanhamento.acompanhar'] %}item-ilha-ativo{% endif %}">
+            <span class="icone-ilha">📦</span>Acompanhar
+        </a>
+        <a href="{{ url_for('auth.login') }}" class="item-ilha">
+            <span class="icone-ilha">🔑</span>Entrar
+        </a>
+    {% endif %}
+</nav>

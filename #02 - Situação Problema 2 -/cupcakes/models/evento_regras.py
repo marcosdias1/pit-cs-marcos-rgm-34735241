@@ -26,6 +26,35 @@ EMAIL_DA_LOJA = "contato@lojadecupcakes.exemplo"
 PRAZO_DE_RESPOSTA = "2 dias úteis"
 
 
+# o texto de cada situação da encomenda (o banco guarda RECEBIDA, ORCADA ou CANCELADA)
+TEXTOS_DO_STATUS = {
+    "RECEBIDA": "Recebida, aguardando o orçamento",
+    "ORCADA": "Orçamento enviado",
+    "CANCELADA": "Cancelada",
+}
+
+
+# função que devolve o texto da situação (se não conhecer, devolve ela mesma)
+def texto_do_status_da_encomenda(status):
+    return TEXTOS_DO_STATUS.get(status, status)
+
+
+# função que escreve a data do evento, ex: "30/11/2026"
+def formatar_data_do_evento(data):
+    if data is None:
+        return ""
+    return data.strftime("%d/%m/%Y")
+
+
+# função que resume a encomenda em uma linha, ex: "50 cupcakes, tema Unicórnio"
+# o tema pode ser None (a pessoa não escreveu)
+def resumir_encomenda(quantidade, tema):
+    texto = str(quantidade) + " cupcakes"
+    if tema is not None and tema != "":
+        texto = texto + ", tema " + tema
+    return texto
+
+
 # função que transforma o texto da data em data de verdade
 # aceita 2026-11-30 (o que o navegador manda) e 30/11/2026 (se a pessoa digitar)
 # devolve a data, ou None se o texto não for uma data

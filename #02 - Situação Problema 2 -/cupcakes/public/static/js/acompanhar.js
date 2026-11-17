@@ -10,6 +10,10 @@ var previsao = document.getElementById("previsao");
 var linhaDoTempo = document.getElementById("linha-do-tempo");
 var avisoJs = document.getElementById("aviso-js");
 
+// esses dois podem não existir na página (o botão de cancelar some quando o pedido não pode mais ser cancelado)
+var avisoSaida = document.getElementById("aviso-saida");
+var areaCancelar = document.getElementById("area-cancelar");
+
 // de quanto em quanto tempo pergunta pro servidor (em milissegundos)
 var TEMPO_ENTRE_CONSULTAS = 5000;
 
@@ -69,6 +73,14 @@ function atualizar() {
             statusDescricao.textContent = dados.descricao;
             previsao.textContent = dados.previsao;
             desenharEtapas(dados.etapas);
+
+            // some o aviso de saída (depois que saiu não faz mais sentido) e o botão de cancelar
+            if (avisoSaida != null) {
+                avisoSaida.hidden = (dados.avisar_saida == false);
+            }
+            if (areaCancelar != null && dados.pode_cancelar == false) {
+                areaCancelar.hidden = true;
+            }
 
             // se já foi entregue, não precisa mais perguntar
             if (dados.entregue) {

@@ -9,25 +9,8 @@
 </head>
 <body>
 
-    <!-- cabeçalho do site -->
-    <div class="topo">
-        <h1>Cupcakes</h1>
-
-        <!-- carrinho e quem está usando o site -->
-        <div class="usuario">
-            <a href="{{ url_for('carrinho.ver_carrinho') }}" class="link-carrinho"
-               aria-label="Carrinho, {{ quantidade_carrinho }} itens">🛒 <span class="qtd-carrinho">{{ quantidade_carrinho }}</span></a> |
-            {% if session.tipo == "cliente" %}
-                Olá, {{ session.nome }} |
-                <a href="{{ url_for('perfil.perfil') }}">Meu perfil</a> |
-                <a href="{{ url_for('pedidos.meus_pedidos') }}">Meus pedidos</a> |
-                <a href="{{ url_for('auth.logout') }}">Sair</a>
-            {% else %}
-                Visitante |
-                <a href="{{ url_for('auth.login') }}">Entrar</a>
-            {% endif %}
-        </div>
-    </div>
+    <!-- cabeçalho do site (um arquivo só, em _topo.html) -->
+    {% include "_topo.html" %}
 
     <div class="conteudo caixa-detalhe">
 
@@ -72,6 +55,14 @@
                     <form method="POST" action="{{ url_for('pedidos.comprar_de_novo', numero=pedido.numero) }}">
                         <button type="submit" class="botao botao-destaque">Comprar de novo</button>
                     </form>
+
+                    <!-- cancelar também muda dados, então é POST (o confirm() pergunta antes pra ninguém cancelar sem querer) -->
+                    {% if pedido.pode_cancelar %}
+                        <form method="POST" action="{{ url_for('pedidos.cancelar', numero=pedido.numero) }}"
+                              onsubmit="return confirm('Cancelar o pedido #{{ pedido.numero }}?');">
+                            <button type="submit" class="botao botao-perigo">Cancelar pedido</button>
+                        </form>
+                    {% endif %}
                 </div>
 
             </div>
@@ -79,6 +70,32 @@
 
         {% if pedidos|length >= limite %}
             <p class="dica">Mostrando os {{ limite }} pedidos mais recentes.</p>
+        {% endif %}
+
+        <!-- encomendas para eventos (os orçamentos que a pessoa pediu com a conta dela) -->
+        {% if encomendas|length > 0 or erro_encomendas != "" %}
+            <h2>Minhas encomendas para eventos</h2>
+
+            {% if erro_encomendas != "" %}
+                <div class="mensagem-erro">{{ erro_encomendas }}</div>
+            {% endif %}
+
+            {% for e in encomendas %}
+                <div class="secao cartao-pedido">
+
+                    <div class="pedido-topo">
+                        <strong>Encomenda, protocolo #{{ e.numero }}</strong>
+                        <span class="pedido-status pedido-status-{{ e.status|lower }}">{{ e.status_texto }}</span>
+                    </div>
+
+                    <div class="dica">Pedida em {{ e.data_texto }}</div>
+                    <div class="pedido-itens">{{ e.resumo }}</div>
+                    <div class="pedido-total">Data do evento: <strong>{{ e.data_evento_texto }}</strong></div>
+
+                </div>
+            {% endfor %}
+
+            <a href="{{ url_for('evento.pedir_orcamento') }}" class="botao">Pedir outro orçamento</a>
         {% endif %}
 
     </div>

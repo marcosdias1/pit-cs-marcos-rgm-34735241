@@ -48,6 +48,12 @@ def status_esperado(segundos):
     return esperado
 
 
+# função que diz se o aviso "você será avisado quando sair para entrega" ainda faz sentido
+# (depois que o pedido saiu, o aviso some)
+def vai_avisar_saida(status):
+    return status in ["CONFIRMADO", "EM_PREPARO"]
+
+
 # função que diz a posição da etapa na lista (0, 1, 2 ou 3)
 # devolve -1 se o status não faz parte do acompanhamento (ex: CANCELADO)
 def posicao_da_etapa(status):
